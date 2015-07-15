@@ -1,0 +1,17 @@
+{
+  "name": "generator-drupal-module",
+  "version": "0.0.0",
+  "description": "Generate a basic Drupal module",
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "license": "ISC",
+  "files": [
+    "app",
+    "files"
+  ],
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "yeoman-generator": "^0.20.1"
+  }
+}
