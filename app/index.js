@@ -7,22 +7,38 @@ module.exports = generators.Base.extend({
   constructor: function() {
     generators.Base.apply(this, arguments);
 
-    this.argument('modulename', { type: String, required: true });
+    this.argument('modulename', { type: String, required: false });
     this.option('path', { type: String });
   },
 
   prompting: function() {
     var done = this.async();
+
     var prompts = [
       {
         name: 'name',
         message: 'Your module name',
-        default: this.modulename
+        default: function(answers) {
+          var name = this.modulename;
+          if (answers.modulename) {
+            name = answers.modulename;
+          }
+          // replace undescores with spaces
+          name = name.replace(/_/g, ' ');
+          words = name.split(/ /);
+          words = words.map(function(word) {
+            return word[0].toUpperCase() + word.substr(1);
+          });
+          name = words.join(' ');
+          return name;
+        }
       },
       {
         name: 'description',
         message: 'Description',
-        default: this.modulename + ' functionality'
+        default: function(answers) {
+          return answers.name + ' functionality'
+        }
       },
       {
         type: 'confirm',
@@ -37,6 +53,14 @@ module.exports = generators.Base.extend({
         default: false
       }
     ];
+
+    // if the modulename is not passed in as an argument, ask for it here
+    if (!this.modulename) {
+      prompts.unshift({
+        name: 'modulename',
+        message: 'The folder name for your module'
+      });
+    }
 
     if (!this.options.path) {
       var defaultPath = this._guessDefaultPath();
@@ -55,6 +79,11 @@ module.exports = generators.Base.extend({
 
   copyMainFiles: function() {
     var modulePath;
+
+    if (!this.modulename && this.answers.modulename) {
+      this.modulename = this.answers.modulename;
+    }
+
     if (this.options.path) {
       modulePath = path.join(this.options.path, this.modulename);
     }
